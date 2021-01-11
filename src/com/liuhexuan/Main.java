@@ -14,9 +14,9 @@ import java.util.*;
 public class Main {
     public static void main(String[] args)  throws Exception  {
         // write your code here
-        int[] cc=new int[1];
-        change(cc);
-        System.out.println(cc[0]);
+
+        int q=5;
+        System.out.printf("%d,%d,%d,%d",q,--q,q,q--);
         Act[] _act = new Act[2];
         _act[0]=new Act("老鼠","垃圾");
         _act[1]=new Act("老虎","吃肉");
