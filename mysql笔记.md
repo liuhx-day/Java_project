@@ -64,7 +64,7 @@ primary key(主键1,主键2)
 default 默认值约束 
 unique 唯一值约束
 not null 非空约束
-constraint 外键名 foreign key 外键字段名 reference 主表名(主表主键名)
+alter table 表名 add constraint 外键名 foreign key 外键字段名 reference 主表名(主表主键名)
 #先从当前表把你要作为外键的字段建好，再去引用
 ```
 
@@ -72,4 +72,74 @@ constraint 外键名 foreign key 外键字段名 reference 主表名(主表主�
 ```mysql
 insert
 replace
+```
+
+## 20210112
+
+删除：
+```mysql
+truncate 无条件删记录
+delete 会存log中
+注意区分 auto_inc
+```
+课堂作业1 9:00
+```mysql
+#用户信息表中的注册时间默认为系统当前时间
+alter table users modify uCreatetime datetime default now() comment '注册时间';
+#用户信息表中的账号当前状态默认值为1
+alter table users add status int default 1 not null comment '账号当前状态';
+#为用户信息表中 uName字段添加唯一值约束。
+alter table users modify uName varchar(30) unique comment '姓名';
+#向用户信息中添加priId字段。
+alter table users add priId int not null comment '权限Id';
+#将刚刚添加的字段作为外键。
+alter table users add constraint
+    fk_users_privilege
+    foreign key(priId)
+        references privilege(pId)
+        on delete cascade on update cascade;
+#向权限表录入数据。
+insert into privilege(pId, pName) values
+                              (1,'管理员'),
+                              (2,'会员');
+#修改表&字段的编码。
+alter table privilege character set gb2312;
+alter table privilege modify pName varchar(10) character set gb2312;
+#向用户信息表录入数据。
+insert into users(uname, upwd, priid)values
+                              ('o3o','pwd',1),
+                              ('oxo','pwd',2);
+#更新用户信息表中uID为1用户的密码。
+update users set uPwd='***' where uID=1;
+#删除用户信息表中uName为oxo的用户信息。
+delete from users where uName='oxo';
+#开启级联后 无论主表的外键字段是否可为空，删除外键表中的数据的同时都会会删除主表相关数据。
+#所以级联要慎重！
+delete from privilege where pId=2;
+select * from users;
+#mysql 密码密文显示
+update users set uPwd=password('1123456') where uID=1;
+#修改密码字段，密文不够存
+alter table users modify uPwd varchar(255) comment '密码';
+```
+正则：
+
+连接：
+```mysql
+#右外连接
+select pName as 权限
+from users right outer join privilege p
+    on p.pId = users.priId
+group by p.pId;
+#左外连接
+select *
+from users left outer join privilege p
+    on p.pId = users.priId
+order by uID desc ;
+#全连接
+select *
+from users s right join privilege p on p.pId = s.priId
+union
+select *
+from users s left join privilege p2 on p2.pId = s.priId;
 ```
