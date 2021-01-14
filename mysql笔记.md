@@ -143,3 +143,94 @@ union
 select *
 from users s left join privilege p2 on p2.pId = s.priId;
 ```
+## 20210113
+索引
+```mysql
+# 创建全文索引
+create fulltext index IX_fullXOrd on orderdetail(dEvalution);
+# 显示索引
+show create table goodstype
+```
+<font color='red'>唯一约束和唯一索引的区别：  
+唯一约束是在表的结构上，唯一约束是在表的查询优化上。
+创建唯一约束自动创建唯一索引，删除唯一约束时同时删除同时创建的索引。  
+唯一约束可以被引用为外键。约束不行。
+</font>
+
+视图
+```mysql
+# 创建视图
+create view 视图名
+as
+select statement
+[with [cascaded | local]check option];
+# 查询视图
+select * from 视图名;
+```
+
+## 2020114 
+课堂练习
+```mysql
+# 1.查询与用户“常昊萍”在同一城市的用户uName,uSex,uPhone和购物车中的gdName及scNum
+select uName,uSex,uPhone,gdName,scNum 
+from users left join shoppingcars as s
+    on users.uID=s.uID
+where uCity in (select uCity from users where uName='常昊萍');
+
+# 2.在GoodType表中，为tName列创建名为IX_tName的普通索引
+create index IX_tName on GoodType(tName);
+
+# 3.在orderdetail表的dEvaluation列上创建IX_fullIXOrd的全文索引
+create fulltext index IX_fullIXOrd on orderdetail(dEvaluation);
+```
+
+问题：  
+1. 在mysql中，索引类型有哪些？  
+普通索引  
+   唯一索引  
+   主键索引  
+   组合索引  
+   全文索引  
+   空间索引
+   
+2. 索引建立的原则？  
+3. 使用命令创建索引有几种方法？  
+4. 使用命令如何修改索引？  
+
+视图
+```mysql
+# 1.创建view_users的视图，用来描述会员的基本信息，包括会员的姓名、密码、性别、出生日期和电话号码。
+create view view_users
+as
+select uName as 姓名,uPwd as 密码,uSex as 性别,uBirthdate as 出生日期,uPhone as 电话号码
+from users
+with check option; # 用于检查select statement 中的一些限制
+# 默认 cascaded 检查所有视图
+# local 只检查要更新的视图本身 
+# 限制举例
+create view v_limit
+as
+    select * from users where uName like 'M%'
+with check option ;
+# 此时执行更新语句向users表中更新姓名不以m开头就会报错。
+# 2.使用视图
+select * from view_users;
+# 3.查看视图
+describe 视图名;
+show create view 视图名;
+show table status like 视图名;
+# 4.修改视图
+create or replace view 视图名;
+alter view 视图名;
+# 5.删除视图
+drop view if exists 视图名 [restrict | cascaded]
+if exists 表示判断视图是否存在
+restrict 表示不能级联删除
+cascaded 表示级联删除
+# 6.更新视图
+update 视图名
+set statement
+# 7.通过更新视图向表内插入数据
+insert 视图名
+values()
+```
